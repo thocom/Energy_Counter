@@ -96,13 +96,13 @@ void callback(char *topic, byte *payload, unsigned int length)
   Serial.println(topic);
   String topicStr = topic;
   char value[MSG_BUFFER_SIZE];
-  char *p = value;                              // Zeiger p an den Anfang des Strings VALUE stellen
+  char *p = value; // Zeiger p an den Anfang des Strings VALUE stellen
 
   for (int i = 0; i < length; i++)
-  { 
-    *p++ = (char)payload[i];                    // empfangene Char's zu String VALUE zusammenfuegen
+  {
+    *p++ = (char)payload[i]; // empfangene Char's zu String VALUE zusammenfuegen
   }
-  *p = '\0';                                    // Ende des Strings VALUE kennzeichnen
+  *p = '\0'; // Ende des Strings VALUE kennzeichnen
 
   if (topicStr == "Energie/Abfrage")
   {
@@ -110,12 +110,12 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (*value == '1')
     {
       Serial.println("Energiewerte werden abgefragt");
-      snprintf(msg, MSG_BUFFER_SIZE, "%ld", stromsummenzaehler);  // Long in String umwandeln
-      client.publish("Energie/Stromverbrauch", msg);        // Datum ueber MQTT an Broker schicken
-      //Serial.println(msg);
+      snprintf(msg, MSG_BUFFER_SIZE, "%ld", stromsummenzaehler); // Long in String umwandeln
+      client.publish("Energie/Stromverbrauch", msg);             // Datum ueber MQTT an Broker schicken
+      // Serial.println(msg);
       snprintf(msg, MSG_BUFFER_SIZE, "%ld", wassersummenzaehler); // Long in String umwandeln
-      client.publish("Energie/Wasser", msg);                // Datum ueber MQTT an Broker schicken
-      //Serial.println(msg);
+      client.publish("Energie/Wasser", msg);                      // Datum ueber MQTT an Broker schicken
+      // Serial.println(msg);
     }
   }
 
@@ -126,40 +126,40 @@ void callback(char *topic, byte *payload, unsigned int length)
     {
       // Serial.println("Temperaturen werden abgefragt");
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WWtempC);    // Float mit 1. Nachkommastelle in String umwandeln
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WWtempC); // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish Warmwasser: ");
       // Serial.println(msg);
-      client.publish("Heizung/Warmwasser", msg);          // Datum ueber MQTT an Broker schicken
+      client.publish("Heizung/Warmwasser", msg); // Datum ueber MQTT an Broker schicken
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HVtempC);    // Float mit 1. Nachkommastelle in String umwandeln
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HVtempC); // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish HeizungVorlauf: ");
       // Serial.println(msg);
-      client.publish("Heizung/HeizungVorlauf", msg);      // Datum ueber MQTT an Broker schicken
+      client.publish("Heizung/HeizungVorlauf", msg); // Datum ueber MQTT an Broker schicken
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HRtempC);    // Float mit 1. Nachkommastelle in String umwandeln
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HRtempC); // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish HeizungRuecklauf: ");
       // Serial.println(msg);
-      client.publish("Heizung/HeizungRuecklauf", msg);    // Datum ueber MQTT an Broker schicken
+      client.publish("Heizung/HeizungRuecklauf", msg); // Datum ueber MQTT an Broker schicken
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WVtempC);    // Float mit 1. Nachkommastelle in String umwandeln
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WVtempC); // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish WasserVorlauf: ");
       // Serial.println(msg);
-      client.publish("Heizung/WasserVorlauf", msg);       // Datum ueber MQTT an Broker schicken
+      client.publish("Heizung/WasserVorlauf", msg); // Datum ueber MQTT an Broker schicken
     }
   }
 
   if (topicStr == "Energie/SollwertGaszaehler")
   {
     // Sollwert Gaszaehler setzen
-    gassummenzaehler = strtol(value, NULL, 0);                      // String to long umwandeln, Basis autodetected
-    preferences.putLong("Gaszaehler", gassummenzaehler);            // in EEPROM des ESP32 speichern
+    gassummenzaehler = strtol(value, NULL, 0);           // String to long umwandeln, Basis autodetected
+    preferences.putLong("Gaszaehler", gassummenzaehler); // in EEPROM des ESP32 speichern
   }
 
   if (topicStr == "Energie/SollwertWasserzaehler")
   {
     // Sollwert Wasserzaehler setzen
-    wassersummenzaehler = strtol(value, NULL, 0);                   // String to long umwandeln, Bais autodetected
-    preferences.putLong("Wasserzaehler", wassersummenzaehler);      // in EEPROM des ESP32 speichern
+    wassersummenzaehler = strtol(value, NULL, 0);              // String to long umwandeln, Bais autodetected
+    preferences.putLong("Wasserzaehler", wassersummenzaehler); // in EEPROM des ESP32 speichern
   }
 }
 
@@ -242,8 +242,8 @@ void read_Water_ticks(void *parameter)
     {
       wassersummenzaehler = wassersummenzaehler + 1;
       preferences.putLong("Wasserzaehler", wassersummenzaehler); // Variable wassersummenzaehler unter "Datei" Wasserzaehler in EEPROM speichern
-      //Serial.print("Wasser neu: ");
-      //Serial.println(wassersummenzaehler);
+      // Serial.print("Wasser neu: ");
+      // Serial.println(wassersummenzaehler);
       snprintf(msg, MSG_BUFFER_SIZE, "%ld", wassersummenzaehler);
       client.publish("Energie/Wasser", msg); // Wasserwert über MQTT zu IoBroker übertragen
     }
@@ -259,7 +259,7 @@ void read_Water_ticks(void *parameter)
     // Serial.print(" ; Wasserzaehler: ");
     // Serial.println(wassersummenzaehler);
 
-    vTaskDelay(100 / portTICK_PERIOD_MS);   //Funktion alle 100ms durchlaufen
+    vTaskDelay(100 / portTICK_PERIOD_MS); // Funktion alle 100ms durchlaufen
   }
 }
 
@@ -270,7 +270,7 @@ void read_Gas_ticks(void *parameter)
   {
     // Input1: __|---|____
     // Input2: ____|---|__
-    //Status:  0 1 2 3 0
+    // Status:  0 1 2 3 0
 
     Gas_Input1 = digitalRead(Gas_Digital_In1); // ersten Input vom Gaszaehler einlesen
     Gas_Input2 = digitalRead(Gas_Digital_In2); // zweiten Input vom Gaszaehler einlesen
@@ -298,8 +298,8 @@ void read_Gas_ticks(void *parameter)
     {
       gassummenzaehler = gassummenzaehler + 10;
       preferences.putLong("Gaszaehler", gassummenzaehler); // Variable wassersummenzaehler unter "Datei" Wasserzaehler in EEPROM speichern
-      //Serial.print("Gas neu: ");
-      //Serial.print(gassummenzaehler);
+      // Serial.print("Gas neu: ");
+      // Serial.print(gassummenzaehler);
       snprintf(msg, MSG_BUFFER_SIZE, "%ld", gassummenzaehler);
       client.publish("Energie/Gas", msg); // Gaswert über MQTT zu IoBroker übertragen
     }
@@ -324,22 +324,22 @@ void readIntoBuffer(void *parameter)
 {
   while (1)
   {
-    char *ptr = &myBuffer[0];
-    while (SerialX.available())
-    {                                              // Sind Rx-Daten vorhandenen?
+    char *ptr = &myBuffer[0];   // Pointer an den Anfang von Array 'myBuffer' stellen
+    while (SerialX.available()) // Sind Rx-Daten vorhandenen?
+    {
       ptr += sprintf(ptr, "%02X", SerialX.read()); // Rx-Daten lesen, in HEX umwandeln und in Buffer schreiben
     }
 
     data180 = strstr(myBuffer, Code180); // Ist die Codierung fuer 1.8.0 im SML-Telegramm enthalten ?
-    if (data180 != NULL)    // Wenn ja, Telegrammteil uebergeben
-    {                         
-      char *p = sml180string; // Zeiger p an den Anfang des Strings stelle
-      for (int i = 40; i <= 53; i++)
-      { // Datenwert aus dem Telegrammteil entnehmen
+    if (data180 != NULL)                 // Wenn ja, Telegrammteil uebergeben
+    {
+      char *p = sml180string;        // Zeiger p an den Anfang des Strings stelle
+      for (int i = 40; i <= 53; i++) // Datenwert an Position 40 bis 53 aus dem Telegrammteil entnehmen
+      {
         *p++ = *(data180 + i);
       }
       *p = '\0';                                   // Ende des Strings kennzeichnen
-      kwh_value = strtoll(sml180string, NULL, 16); // String mit Datenwert in Long umrechnen
+      kwh_value = strtoll(sml180string, NULL, 16); // String mit Datenwert in LongLong umrechnen
       // Serial.print("Zählerstand: ");
       stromsummenzaehler = long(kwh_value / 10);
       // Serial.print(stromsummenzaehler);
@@ -351,27 +351,27 @@ void readIntoBuffer(void *parameter)
     }
 
     data1670 = strstr(myBuffer, Code1670); // Ist die Codierung fuer 1.8.0 im SML-Telegramm enthalten ?
-    if (data1670 != NULL)
-    {                          // Wenn ja, Telegrammteil uebergeben
-      char *p = sml1670string; // Zeiger p an den Anfang des Strings stelle
-      for (int i = 30; i <= 37; i++)
-      { // Datenwert aus dem Telegrammteil entnehmen
+    if (data1670 != NULL)                  // Wenn ja, Telegrammteil uebergeben
+    {
+      char *p = sml1670string;       // Zeiger p an den Anfang des Strings stelle
+      for (int i = 30; i <= 37; i++) // Datenwert an Positon 30 bis 37 aus dem Telegrammteil entnehmen
+      {
         *p++ = *(data1670 + i);
       }
       *p = '\0';                                           // Ende des Strings kennzeichnen
-      stromistleistung = strtoll(sml1670string, NULL, 16); // String mit Datenwert in Long umrechnen
+      stromistleistung = strtoll(sml1670string, NULL, 16); // String mit Datenwert in LongLong umrechnen
       // Serial.print("akt. Stromverbrauch: ");
       // Serial.print(stromistleistung);
       // Serial.println(" W");
-      snprintf(msg, MSG_BUFFER_SIZE, "%ld", stromistleistung);
-      client.publish("Energie/Stromgesamtleistung", msg);
+      snprintf(msg, MSG_BUFFER_SIZE, "%ld", stromistleistung); // LongLong in String umwandeln
+      client.publish("Energie/Stromgesamtleistung", msg);      // Wert per MQTT an Broker uebertragen
     }
     else
     {
       // Serial.println("1670 nicht gefunden");
     }
 
-    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    vTaskDelay(10000 / portTICK_PERIOD_MS); // Funktion alle 10s wiederholen
   }
 }
 
@@ -380,20 +380,19 @@ void DALLASTemperatures(void *parameter)
 {
   while (1)
   {
-    // Temperatur abrufen
-    sensors.requestTemperatures(); // Send the command to get temperatures
+    sensors.requestTemperatures(); // Temperaturanfrage anfordern
 
-    old_WWtempC = WWtempC;
+    old_WWtempC = WWtempC; // vorige Werte zwischenspeichern
     old_HVtempC = HVtempC;
     old_HRtempC = HRtempC;
     old_WVtempC = WVtempC;
 
-    WWtempC = sensors.getTempC(DallasWW);
+    WWtempC = sensors.getTempC(DallasWW); // neuen Werte auslesen
     HVtempC = sensors.getTempC(DallasHV);
     HRtempC = sensors.getTempC(DallasHR);
     WVtempC = sensors.getTempC(DallasWV);
 
-    if ((WWtempC < -10) | (WWtempC > 120))
+    if ((WWtempC < -10) | (WWtempC > 120)) // Fehlmessung, vorigen Wert beibehalten
       WWtempC = old_WWtempC;
     if ((HVtempC < -10) | (HVtempC > 120))
       HVtempC = old_HVtempC;
@@ -402,7 +401,7 @@ void DALLASTemperatures(void *parameter)
     if ((WVtempC < -10) | (WVtempC > 120))
       WVtempC = old_WVtempC;
 
-    vTaskDelay(30000 / portTICK_PERIOD_MS);
+    vTaskDelay(30000 / portTICK_PERIOD_MS); // Funktion alle 30s wiederholen
   }
 }
 
