@@ -1,12 +1,12 @@
 # Energy_Counter
-Programm fuer ESP32 zur Auslesung der Energiewerte meines Hauses:
+ESP32 software to read the electricity/gas and water consumption of my private house:
 
-- Strom: Nutzung des SML-Protokolls der Stromwerte aus meinem ISKRA MT681 Zaehlers 
+- electricity: Using the SML-protocol of the smart meter ISKRA MT681 to transfer data via ESP32 and MQTT to broker.  
 
-- Gas: Ablesung des silbernen Punktes bei der Zahl 6 auf dem ITRON Gaszaehlers mit Hilfe einer erweiterten TCRT5000 Lichtschranke
+- gas: Reading of the silver dot at postion number 6 of a ITRON gas meter with the help of an extended TCRT5000 light barrier
 
-- Wasser: Ablesung des drehenden Rades eines Standardwasserzaehlers mit Hilfe einer erweiterten TCRT5000 Lichtschranke
+- water: Reading the rotating wheel of a standard water meter using an extended TCRT5000 light barrier
 
-Umbau TCRT5000 mit 2 IR-Dioden zur Erkennung des kompletten Durchlaufs eines Punktes am Gas- oder Wasserzaehler :
+Conversion of a TCRT5000 with2 IR-Diodes to detect a complete cycle of the gas or water meter. This manipulated device with 2 IR-diodes recognizes the movement of the counter by the correct sequence of the positive and negative edges at the inputs of the ESP32:
 
 ![TCRT5000 doppelt](https://user-images.githubusercontent.com/76279852/213930673-a9e1f557-3765-40b4-a3f6-ac5b35fe5bd1.jpg)
