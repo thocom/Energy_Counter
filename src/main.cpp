@@ -29,8 +29,8 @@ written by Thorsten Heins
 #define ControlLED 16        // Kontroll-LED für MQTT Verbindung
 
 //-- WIFI section --------------------------------
-const char *wifi_ssid = "Hotzenplotz";
-const char *wifi_pass = "spjz16spjz16spjz16";
+const char *wifi_ssid = "SSID-WIFI";
+const char *wifi_pass = "SSID-PW";
 const char *mqtt_server = "192.168.178.216"; // IP-Adresse IO-Broker
 
 // Strommessung
@@ -96,13 +96,13 @@ void callback(char *topic, byte *payload, unsigned int length)
   Serial.println(topic);
   String topicStr = topic;
   char value[MSG_BUFFER_SIZE];
-  char *p = value; // Zeiger p an den Anfang des Strings VALUE stellen
+  char *p = value;                              // Zeiger p an den Anfang des Strings VALUE stellen
 
   for (int i = 0; i < length; i++)
-  { // empfangene Char's zu String zusammenfuegen
-    *p++ = (char)payload[i];
+  { 
+    *p++ = (char)payload[i];                    // empfangene Char's zu String VALUE zusammenfuegen
   }
-  *p = '\0'; // Ende des Strings kennzeichnen
+  *p = '\0';                                    // Ende des Strings VALUE kennzeichnen
 
   if (topicStr == "Energie/Abfrage")
   {
@@ -110,56 +110,56 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (*value == '1')
     {
       Serial.println("Energiewerte werden abgefragt");
-      snprintf(msg, MSG_BUFFER_SIZE, "%ld", stromsummenzaehler);
-      client.publish("Energie/Stromverbrauch", msg);
-      Serial.println(msg);
-      snprintf(msg, MSG_BUFFER_SIZE, "%ld", wassersummenzaehler);
-      client.publish("Energie/Wasser", msg);
-      Serial.println(msg);
+      snprintf(msg, MSG_BUFFER_SIZE, "%ld", stromsummenzaehler);  // Long in String umwandeln
+      client.publish("Energie/Stromverbrauch", msg);        // Datum ueber MQTT an Broker schicken
+      //Serial.println(msg);
+      snprintf(msg, MSG_BUFFER_SIZE, "%ld", wassersummenzaehler); // Long in String umwandeln
+      client.publish("Energie/Wasser", msg);                // Datum ueber MQTT an Broker schicken
+      //Serial.println(msg);
     }
   }
 
   if (topicStr == "Energie/Temperaturabfrage")
   {
-    // Energiedaten werden abgefragt
+    // Temperaturdaten werden abgefragt
     if (*value == '1')
     {
       // Serial.println("Temperaturen werden abgefragt");
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WWtempC);
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WWtempC);    // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish Warmwasser: ");
       // Serial.println(msg);
-      client.publish("Heizung/Warmwasser", msg);
+      client.publish("Heizung/Warmwasser", msg);          // Datum ueber MQTT an Broker schicken
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HVtempC);
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HVtempC);    // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish HeizungVorlauf: ");
       // Serial.println(msg);
-      client.publish("Heizung/HeizungVorlauf", msg);
+      client.publish("Heizung/HeizungVorlauf", msg);      // Datum ueber MQTT an Broker schicken
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HRtempC);
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", HRtempC);    // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish HeizungRuecklauf: ");
       // Serial.println(msg);
-      client.publish("Heizung/HeizungRuecklauf", msg);
+      client.publish("Heizung/HeizungRuecklauf", msg);    // Datum ueber MQTT an Broker schicken
 
-      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WVtempC);
+      snprintf(msg, MSG_BUFFER_SIZE, "%.0f", WVtempC);    // Float mit 1. Nachkommastelle in String umwandeln
       // Serial.print("; Publish WasserVorlauf: ");
       // Serial.println(msg);
-      client.publish("Heizung/WasserVorlauf", msg);
+      client.publish("Heizung/WasserVorlauf", msg);       // Datum ueber MQTT an Broker schicken
     }
   }
 
   if (topicStr == "Energie/SollwertGaszaehler")
   {
     // Sollwert Gaszaehler setzen
-    gassummenzaehler = strtol(value, NULL, 0);
-    preferences.putLong("Gaszaehler", gassummenzaehler);
+    gassummenzaehler = strtol(value, NULL, 0);                      // String to long umwandeln, Basis autodetected
+    preferences.putLong("Gaszaehler", gassummenzaehler);            // in EEPROM des ESP32 speichern
   }
 
   if (topicStr == "Energie/SollwertWasserzaehler")
   {
     // Sollwert Wasserzaehler setzen
-    wassersummenzaehler = strtol(value, NULL, 0);
-    preferences.putLong("Wasserzaehler", wassersummenzaehler);
+    wassersummenzaehler = strtol(value, NULL, 0);                   // String to long umwandeln, Bais autodetected
+    preferences.putLong("Wasserzaehler", wassersummenzaehler);      // in EEPROM des ESP32 speichern
   }
 }
 
