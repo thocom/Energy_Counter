@@ -47,17 +47,17 @@ unsigned long kwh_value;
 unsigned long stromistleistung;
 
 // Wassermessung
-boolean W_FlipFlopA = false;
-boolean W_FlipFlopB = false;
-int W_status = 0;
-int W_old_status = 0;
+boolean Wasser_Input1 = false;
+boolean Wasser_Input2 = false;
+int Wasser_Status = 0;
+int old_Wasser_Status = 0;
 long wassersummenzaehler;
 
 // Gasmessung
-boolean G_FlipFlopA = false;
-boolean G_FlipFlopB = false;
-int G_status = 0;
-int G_old_status = 0;
+boolean Gas_Input1 = false;
+boolean Gas_Input2 = false;
+int Gas_Status = 0;
+int old_Gas_Status = 0;
 long gassummenzaehler;
 u_long millis_old = 0;
 
@@ -212,51 +212,54 @@ void read_Water_ticks(void *parameter)
 {
   while (1)
   {
+    // Input1: __|---|____
+    // Input2: ____|---|__
+    // Status:  0 1 2 3 0
 
-    W_FlipFlopA = digitalRead(Water_Digital_In1); // ersten Tick vom Wasserzaehler einlesen
-    W_FlipFlopB = digitalRead(Water_Digital_In2); // zweiten Tick vom Wasserzaehler einlesen
+    Wasser_Input1 = digitalRead(Water_Digital_In1); // ersten Input vom Wasserzaehler einlesen
+    Wasser_Input2 = digitalRead(Water_Digital_In2); // zweiten Input vom Wasserzaehler einlesen
 
     // Status eines Durchgangs ermitteln
-    if (!W_FlipFlopA && !W_FlipFlopB)
+    if (!Wasser_Input1 && !Wasser_Input2)
     {
-      W_status = 0;
+      Wasser_Status = 0;
     }
-    if (W_status == 0 && W_FlipFlopA && !W_FlipFlopB)
+    if (Wasser_Status == 0 && Wasser_Input1 && !Wasser_Input2)
     {
-      W_status = 1;
+      Wasser_Status = 1;
     }
-    if (W_status == 1 && W_FlipFlopA && W_FlipFlopB)
+    if (Wasser_Status == 1 && Wasser_Input1 && Wasser_Input2)
     {
-      W_status = 2;
+      Wasser_Status = 2;
     }
-    if (W_status == 2 && !W_FlipFlopA && W_FlipFlopB)
+    if (Wasser_Status == 2 && !Wasser_Input1 && Wasser_Input2)
     {
-      W_status = 3;
+      Wasser_Status = 3;
     }
 
     // Ein ordentlicher Durchlauf ist erfolgt
-    if (W_old_status != 3 && W_status == 3)
+    if (old_Wasser_Status != 3 && Wasser_Status == 3)
     {
       wassersummenzaehler = wassersummenzaehler + 1;
       preferences.putLong("Wasserzaehler", wassersummenzaehler); // Variable wassersummenzaehler unter "Datei" Wasserzaehler in EEPROM speichern
-      Serial.print("Wasser neu: ");
-      Serial.println(wassersummenzaehler);
+      //Serial.print("Wasser neu: ");
+      //Serial.println(wassersummenzaehler);
       snprintf(msg, MSG_BUFFER_SIZE, "%ld", wassersummenzaehler);
       client.publish("Energie/Wasser", msg); // Wasserwert über MQTT zu IoBroker übertragen
     }
 
-    W_old_status = W_status;
+    old_Wasser_Status = Wasser_Status;
 
     // erial.print("FlipFlop 1: ");
-    // Serial.print(W_FlipFlopA);
+    // Serial.print(Wasser_Input1);
     // Serial.print(" ; FlipFlop2: ");
-    // Serial.print(W_FlipFlopB);
+    // Serial.print(Wasser_Input2);
     // Serial.print(" ; Status: ");
-    // Serial.print(W_status);
+    // Serial.print(Wasser_Status);
     // Serial.print(" ; Wasserzaehler: ");
     // Serial.println(wassersummenzaehler);
 
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);   //Funktion alle 100ms durchlaufen
   }
 }
 
@@ -265,47 +268,50 @@ void read_Gas_ticks(void *parameter)
 {
   while (1)
   {
+    // Input1: __|---|____
+    // Input2: ____|---|__
+    //Status:  0 1 2 3 0
 
-    G_FlipFlopA = digitalRead(Gas_Digital_In1); // ersten Tick vom Gaszaehler einlesen
-    G_FlipFlopB = digitalRead(Gas_Digital_In2); // zweiten Tick vom Gaszaehler einlesen
+    Gas_Input1 = digitalRead(Gas_Digital_In1); // ersten Input vom Gaszaehler einlesen
+    Gas_Input2 = digitalRead(Gas_Digital_In2); // zweiten Input vom Gaszaehler einlesen
 
     // Status eines Durchgangs ermitteln
-    if (!G_FlipFlopA && !G_FlipFlopB)
+    if (!Gas_Input1 && !Gas_Input2)
     {
-      G_status = 0;
+      Gas_Status = 0;
     }
-    if (G_status == 0 && G_FlipFlopA && !G_FlipFlopB)
+    if (Gas_Status == 0 && Gas_Input1 && !Gas_Input2)
     {
-      G_status = 1;
+      Gas_Status = 1;
     }
-    if (G_status == 1 && G_FlipFlopA && G_FlipFlopB)
+    if (Gas_Status == 1 && Gas_Input1 && Gas_Input2)
     {
-      G_status = 2;
+      Gas_Status = 2;
     }
-    if (G_status == 2 && !G_FlipFlopA && G_FlipFlopB)
+    if (Gas_Status == 2 && !Gas_Input1 && Gas_Input2)
     {
-      G_status = 3;
+      Gas_Status = 3;
     }
 
     // Ein ordentlicher Durchlauf ist erfolgt
-    if (G_old_status != 3 && G_status == 3)
+    if (old_Gas_Status != 3 && Gas_Status == 3)
     {
       gassummenzaehler = gassummenzaehler + 10;
       preferences.putLong("Gaszaehler", gassummenzaehler); // Variable wassersummenzaehler unter "Datei" Wasserzaehler in EEPROM speichern
-      Serial.print("Gas neu: ");
-      Serial.print(gassummenzaehler);
+      //Serial.print("Gas neu: ");
+      //Serial.print(gassummenzaehler);
       snprintf(msg, MSG_BUFFER_SIZE, "%ld", gassummenzaehler);
       client.publish("Energie/Gas", msg); // Gaswert über MQTT zu IoBroker übertragen
     }
 
-    G_old_status = G_status;
+    old_Gas_Status = Gas_Status;
 
     // Serial.print("FlipFlop 1: ");
-    // Serial.print(G_FlipFlopA);
+    // Serial.print(Gas_Input1);
     // Serial.print(" ; FlipFlop2: ");
-    // Serial.print(G_FlipFlopB);
+    // Serial.print(Gas_Input2);
     // Serial.print(" ; Status: ");
-    // Serial.print(G_status);
+    // Serial.print(Gas_Status);
     // Serial.print(" ; Gaszaehler: ");
     // Serial.println(gassummenzaehler);
 
@@ -324,9 +330,9 @@ void readIntoBuffer(void *parameter)
       ptr += sprintf(ptr, "%02X", SerialX.read()); // Rx-Daten lesen, in HEX umwandeln und in Buffer schreiben
     }
 
-    data180 = strstr(myBuffer, Code180); // Ist die Codierung fuer 1.8.0 im SML-Telegramm enthalten
-    if (data180 != NULL)
-    {                         // Wenn ja, Telegrammteil uebergeben
+    data180 = strstr(myBuffer, Code180); // Ist die Codierung fuer 1.8.0 im SML-Telegramm enthalten ?
+    if (data180 != NULL)    // Wenn ja, Telegrammteil uebergeben
+    {                         
       char *p = sml180string; // Zeiger p an den Anfang des Strings stelle
       for (int i = 40; i <= 53; i++)
       { // Datenwert aus dem Telegrammteil entnehmen
@@ -344,7 +350,7 @@ void readIntoBuffer(void *parameter)
       // Serial.println("180 nicht gefunden");
     }
 
-    data1670 = strstr(myBuffer, Code1670); // Ist die Codierung fuer 1.8.0 im SML-Telegramm enthalten
+    data1670 = strstr(myBuffer, Code1670); // Ist die Codierung fuer 1.8.0 im SML-Telegramm enthalten ?
     if (data1670 != NULL)
     {                          // Wenn ja, Telegrammteil uebergeben
       char *p = sml1670string; // Zeiger p an den Anfang des Strings stelle
